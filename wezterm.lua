@@ -22,13 +22,12 @@ local function spawn_personal_workspace(window, pane)
 		cwd = "F:/S/notes/",
 	})
 	tab:set_title("Notes")
-	pane1:send_text("nvim .\r")
+	pane1:send_text("nvim\r")
 
 	local tab2, pane2 = mux_window:spawn_tab({
 		cwd = "F:/S/projects/",
 	})
 	tab2:set_title("Nvim")
-	-- pane2:send_text("nvim .\n")
 
 	window:perform_action(act.SwitchToWorkspace({ name = "Personal" }), pane)
 end
@@ -41,7 +40,7 @@ end
 local config = wezterm.config_builder()
 -- Powershell Core as default
 config.default_prog = { "C:\\Program Files\\PowerShell\\7\\pwsh.exe" }
-
+config.default_cwd = wezterm.home_dir
 config.initial_cols = 140
 config.initial_rows = 40
 
@@ -56,8 +55,8 @@ local bar = wezterm.plugin.require("https://github.com/adriankarlen/bar.wezterm"
 bar.apply_to_config(config, {
 	separator = {
 		space = 1,
-		left_icon = wezterm.nerdfonts.arrow_small_right,
-		right_icon = wezterm.nerdfonts.arrow_small_left,
+		left_icon = "",
+		right_icon = "",
 	},
 	modules = {
 		username = {
@@ -112,6 +111,11 @@ config.colors = {
 		"#56b6c2",
 		"#ffffff",
 	},
+	-- Overrides the cell background color when the current cell is occupied by the
+	-- cursor and the cursor style is set to Block
+	cursor_bg = "#e5c07b",
+	-- Overrides the text color when the current cell is occupied by the cursor
+	cursor_fg = "#282c34",
 	tab_bar = {
 		-- The color of the strip that goes along the top of the window
 		-- (does not apply when fancy tab bar is in use)
@@ -200,7 +204,9 @@ config.keys = {
 	{
 		key = "t",
 		mods = "ALT",
-		action = wezterm.action.SpawnTab("CurrentPaneDomain"),
+		action = wezterm.action.SpawnCommandInNewTab({
+			cwd = wezterm.home_dir,
+		}),
 	},
 	{
 		key = "w",
